@@ -17,4 +17,4 @@ TRAIN_ENCODED_TEXTES = r'saved_tokenizer/train_encoded_textes.pth'
 TEST_ENCODED_TEXTES = r'saved_tokenizer/test_encoded_textes.pth'
 VOCAB_PATH = r'saved_tokenizer/vocab.pt'
 
-MERGES = 3000
+MERGES = 2000

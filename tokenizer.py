@@ -2,6 +2,7 @@ import pandas as pd
 import os
 from collections import Counter
 import torch
+from tqdm import tqdm
 
 class BPE:
     def __init__(self, data_dir, train_data_path):
@@ -106,7 +107,7 @@ class BPE:
         tokens = self.tokens
         merges = self.merges
         
-        for _ in range(num_iterations):
+        for _ in tqdm(range(num_iterations),desc='Training bpe...'):
             
             pairs_freq, best_pair = self.make_pairs(tokens)
             updated_tokens, updated_merges= self.concat_best_pair(tokens, best_pair,merges)
@@ -164,7 +165,7 @@ class BPE:
                         
                 letters = new_letters
             
-            out_tokens.append([stoi[letter] for letter in letters])
+            out_tokens.append([stoi.get(letter, stoi['<unk>']) for letter in letters])
             
         flat = [item for sublist in out_tokens for item in sublist]
         
