@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
-from config import MAX_SEQ_LEN,BATCH_SIZE
+from config import MAX_SEQ_LEN,BATCH_SIZE,TRAIN_ENCODED_TEXTES,TEST_ENCODED_TEXTES
 
 class WikiTextDataset:
     def __init__(self,all_tokens,block_size):
@@ -24,7 +24,7 @@ class WikiTextDataset:
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-train_tokens = torch.load(r'saved_tokenizer\train_tokens.pt',weights_only=True)
+train_tokens = torch.load(TRAIN_ENCODED_TEXTES,weights_only=True)
 train_dataset = WikiTextDataset(train_tokens,MAX_SEQ_LEN)    
 
 train_dataloader = DataLoader(
@@ -35,7 +35,7 @@ train_dataloader = DataLoader(
     pin_memory_device=device
 )
 
-test_tokens = torch.load(r'saved_tokenizer\test_tokens.pt',weights_only=True)
+test_tokens = torch.load(TEST_ENCODED_TEXTES,weights_only=True)
 test_dataset = WikiTextDataset(test_tokens,MAX_SEQ_LEN)
 
 test_dataloader = DataLoader(

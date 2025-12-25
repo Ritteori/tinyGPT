@@ -124,8 +124,8 @@ class BPE:
             path (_type_): _description_
         """
         
-        vocab = list(self.chars) + self.merges
-        stoi = {tok: i+1 for i, tok in enumerate(vocab)}
+        vocab = ['<unk>'] + list(self.chars) + self.merges
+        stoi = {tok: i for i, tok in enumerate(vocab)}
         itos = {i: tok for tok, i in stoi.items()}
         
         state = {
@@ -181,7 +181,7 @@ class BPE:
         
         out_str = []
 
-        for token in  tokens:
+        for token in tokens:
             
             char = itos[token]
             
