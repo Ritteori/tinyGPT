@@ -7,7 +7,7 @@ DROPOUT = 0.2
 
 BATCH_SIZE = 16
 LR = 3e-4
-EPOCHS = 12
+EPOCHS = 7
 
 DATA_DIR = r'data'
 LOG_DIR = r'logs'

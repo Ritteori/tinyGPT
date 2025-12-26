@@ -58,7 +58,7 @@ def train(model,train_dataloder,test_dataloader,loss_fn,optimizer,device,epochs,
                 
                 if debug_mode:
                     rand_int = random.randint(0,2000)
-                    if rand_int >= 1900:
+                    if rand_int >= 1999:
                         print("===================== DEBUG INFO =====================\n")
                         print(f"Target:{flat_y[0:30]}\n")
                         print(f"Prediction:{preds[0:30]}\n")                     
@@ -101,7 +101,7 @@ def train(model,train_dataloder,test_dataloader,loss_fn,optimizer,device,epochs,
         
         print(f'Epoch:{epoch + 1} | Test loss:{mean_test_loss:.4f} | Test perplexity:{test_ppx:.4f} | Test accuracy:{test_accuracy:.2f} %')
         
-        if (epoch + 1) == 5:
+        if (epoch + 1) == 5 or (epoch + 1) == epochs:
             torch.save(model,os.path.join(save_dir,fr'tinyGPT_{epoch + 1}epochs.pth'))
         
         writer.add_scalar('Loss/Train',train_loss,epoch + 1)
@@ -119,4 +119,20 @@ def grad_norm(model):
             total_norm += p.grad.data.norm(2).item() ** 2
     
     return total_norm ** 0.5
+
+def answer(model,tokenizer,device,prompt,length=30):
+    
+    model.eval()
+    with torch.no_grad():
+        ids = tokenizer.encode(prompt)
+        ids = torch.tensor(ids, device=device).unsqueeze(0)  # [1, T]
+
+        for _ in range(length):
+            logits = model(ids)              # [1, T, V]
+            next_token_logits = logits[:, -1, :]  # last token
+            next_token = torch.argmax(next_token_logits, dim=-1)  # [1]
+
+            ids = torch.cat([ids, next_token.unsqueeze(0)], dim=1)
+
+        return tokenizer.decode(ids[0].tolist())
             

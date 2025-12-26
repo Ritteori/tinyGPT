@@ -5,25 +5,39 @@ import torch
 from tqdm import tqdm
 
 class BPE:
-    def __init__(self, data_dir, train_data_path):
-        dataset = pd.read_parquet(os.path.join(data_dir, train_data_path))
-
-        word_counter = Counter()
-        for row in dataset.values:
-            for sentence in row:
-                for w in sentence.strip().lower().split():
-                    word_counter[w + "</w>"] += 1
-
-        self.word_counter = word_counter
+    def __init__(self, data_dir, train_data_path, exists=True, merges=None, stoi=None, itos=None):
         
-        self.chars = sorted({c for w in word_counter for c in w})
-        self.tokens = {}
-        for w, f in word_counter.most_common(30000):
-            self.tokens[w] = f
+        if not exists:
+            
+            dataset = pd.read_parquet(os.path.join(data_dir, train_data_path))
 
-        self.tokens = {tuple(key):value for key,value in self.tokens.items()}
-        self.merges = []
-        
+            word_counter = Counter()
+            for row in dataset.values:
+                for sentence in row:
+                    for w in sentence.strip().lower().split():
+                        word_counter[w + "</w>"] += 1
+
+            self.word_counter = word_counter
+            
+            self.chars = sorted({c for w in word_counter for c in w})
+            self.tokens = {}
+            for w, f in word_counter.most_common(30000):
+                self.tokens[w] = f
+
+            self.tokens = {tuple(key):value for key,value in self.tokens.items()}
+
+            self.merges = []
+            
+        else:
+            
+            assert merges is not None
+            assert stoi is not None
+            assert itos is not None
+            
+            self.stoi = stoi
+            self.itos = itos
+            self.merges = merges
+            
     def make_pairs(self,tokens):
         """Make pairs
 
@@ -115,6 +129,8 @@ class BPE:
             tokens = updated_tokens
             merges = updated_merges
             
+        self.tokens = tokens
+            
         return tokens, self.merges
     
     def save(self,path):
@@ -137,14 +153,14 @@ class BPE:
         
         torch.save(state, path)
         
-    def encode(self, sentence, stoi):
+    def encode(self, sentence):
         """_summary_
 
         Args:
             sentence (_type_): _description_
-            stoi (_type_): _description_
         """
         
+        stoi = self.stoi
         words = sentence.strip().lower().split()
         
         out_tokens = []
@@ -171,14 +187,14 @@ class BPE:
         
         return flat
          
-    def decode(self, tokens, itos):
+    def decode(self, tokens):
         """_summary_
 
         Args:
             tokens (_type_): _description_
-            itos (_type_): _description_
         """
         
+        itos = self.itos
         out_str = []
 
         for token in tokens:
