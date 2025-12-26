@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TinyGPT Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 50px;
+        }
+        h2 {
+            color: #333;
+        }
+        input[type="text"] {
+            width: 400px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        button {
+            margin-left: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 6px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #output {
+            margin-top: 20px;
+            width: 500px;
+            min-height: 100px;
+            padding: 15px;
+            border-radius: 6px;
+            background: white;
+            border: 1px solid #ccc;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h2>TinyGPT Text Generator</h2>
+    <div>
+        <input type="text" id="promptInput" placeholder="Enter prompt here">
+        <button onclick="generateText()">Generate</button>
+    </div>
+    <div id="output"></div>
+
+    <script>
+        async function generateText() {
+            const prompt = document.getElementById('promptInput').value;
+            const response = await fetch('http://127.0.0.1:8000/generate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({prompt: prompt, max_tokens: 50})
+            });
+            const data = await response.json();
+            document.getElementById('output').innerText = data.generated_text;
+        }
+    </script>
+</body>
+</html>
